@@ -27,7 +27,7 @@ const pageProcessor = (htmlString) => {
         if (!links[link]) {
             links[link] = 'In Queue........';
             q.push(link);
-            fs.appendFile('links.csv', link + "\n", function (err, result) {
+            fs.appendFile('url.csv', link + "\n", function (err, result) {
                 if (err) console.log('error', err);
             });
         }
@@ -54,5 +54,5 @@ export const requestHandler = (url) => {
     root = url
     q = async.queue(fetchAndParser, 5)
     links[url] = 'In Queue........';
-    fs.unlink('links.csv', () => q.push(stripTrailingSlash(root)));
+    fs.unlink('url.csv', () => q.push(stripTrailingSlash(root)));
 }
