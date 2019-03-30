@@ -25,6 +25,8 @@
     "cheerio": "^1.0.0-rc.2",
     "esm": "^3.2.22",
     "fs": "0.0.1-security",
+    "json2csv": "^4.4.1",
+    "mongoose": "^5.4.20",
     "request": "^2.88.0"
   }
 }
