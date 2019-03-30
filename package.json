@@ -1,0 +1,30 @@
+{
+  "name": "crawler-ass",
+  "version": "1.0.0",
+  "description": "harvest all possible hyperlinks that belong to medium.com and store them in a database of your choice ",
+  "main": "crawler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r esm index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/geekfarmer/crawler-ass.git"
+  },
+  "keywords": [
+    "crawler"
+  ],
+  "author": "Anurag Patel <anuragpatel.optnio@gmail.com> (geekfarmer.tech)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/geekfarmer/crawler-ass/issues"
+  },
+  "homepage": "https://github.com/geekfarmer/crawler-ass#readme",
+  "dependencies": {
+    "async": "^2.6.2",
+    "cheerio": "^1.0.0-rc.2",
+    "esm": "^3.2.22",
+    "fs": "0.0.1-security",
+    "request": "^2.88.0"
+  }
+}
