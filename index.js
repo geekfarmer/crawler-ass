@@ -6,8 +6,6 @@
 // https://stackoverflow.com/questions/34855352/how-in-general-does-node-js-handle-10-000-concurrent-requests
 
 import {requestHandler} from './src/services/medium_crawler';
-// const crawler = new MediumCrawler();
 const url = "https://medium.com";
 
 requestHandler(url);
-

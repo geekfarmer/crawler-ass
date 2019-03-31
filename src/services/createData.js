@@ -11,7 +11,7 @@ const create = (url, count, params) => {
 
     createData.save()
         .then(doc => {
-            // console.log(doc);
+            console.log(doc);
             return doc;
         })
         .catch(err => {

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-const server = '127.0.0.1:27017'; // db server
+const server = 'mongo:27017'; // db server
 const database = 'Medium'; // db name
 
 class Database {
@@ -7,7 +7,10 @@ class Database {
     this._connect()
   }
   _connect() {
-    mongoose.connect(`mongodb://${server}/${database}`)
+    mongoose.connect(`mongodb://${server}/${database}`, {
+        keepAlive: true,
+        reconnectTries: Number.MAX_VALUE,
+      })
       .then(() => {
         console.log('Database connection successful')
       })

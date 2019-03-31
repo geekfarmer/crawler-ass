@@ -5,12 +5,12 @@ import async from 'async'
 import create from './createData'
 import update from './updateData'
 
-var root = ''
-var q = null
+var rootURL = ''
+var que = null
 var links = {}
 var link = ''
 
-const stripTrailingSlash = (str) => {    
+const stripSlash = (str) => {    
     if (str.substr(-1) === '/') {       
         return str.substr(0, str.length - 1);
     }    
@@ -27,17 +27,17 @@ const getParamsFromURL = (str) => {
     }
 }
 
-const pageProcessor = (htmlString) => {
+const htmlScrapper = (body) => {
 
-    let ch = cheerio.load(htmlString);
+    let ch = cheerio.load(body);
 
     // filter links only belongs medium.com
-    ch(`a[href^="${root}"]`).each((i, a) => {
+    ch(`a[href^="${rootURL}"]`).each((i, a) => {
 
         // Ignore query params. Those point to same URL
         let params = []
         params = getParamsFromURL(a.attribs.href.split('?')[1])
-        link = stripTrailingSlash(a.attribs.href.split('?')[0])
+        link = stripSlash(a.attribs.href.split('?')[0])
         
         // Ignore URLs which are already there
         if (!links[link]) {
@@ -53,7 +53,7 @@ const pageProcessor = (htmlString) => {
                 links[link]['params'] = params;
             }            
 
-            q.push(link);
+            que.push(link);
             try{
                 create(link, links[link]['count'], links[link]['params'])
             }catch(e){
@@ -71,7 +71,7 @@ const pageProcessor = (htmlString) => {
             }
             update(link, links[link]['count'], links[link]['params'])
         }        
-    });    
+    }); 
 }
 
 const fetchAndParser = (url, callback) => {
@@ -80,7 +80,7 @@ const fetchAndParser = (url, callback) => {
             console.log("Network Error", error);
             callback(error, url);
         } else {
-            pageProcessor(body);
+            htmlScrapper(body);
             links[url] = {};
             links[url]['status'] = 'true';
             links[url]['count'] = 1; 
@@ -90,7 +90,7 @@ const fetchAndParser = (url, callback) => {
 }
 
 export const requestHandler = (url) => {
-    root = url
-    q = async.queue(fetchAndParser, 5)
-    fs.unlink('url.csv', () => q.push(stripTrailingSlash(root)));
+    rootURL = url
+    que = async.queue(fetchAndParser, 5)
+    fs.unlink('url.csv', () => que.push(stripSlash(rootURL)));
 }
