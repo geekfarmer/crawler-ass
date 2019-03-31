@@ -2,7 +2,8 @@ import request from 'request'
 import fs from 'fs'
 import cheerio from 'cheerio'
 import async from 'async'
-import json2csv from 'json2csv'
+import create from './createData'
+import update from './updateData'
 
 var root = ''
 var q = null
@@ -29,8 +30,10 @@ const getParamsFromURL = (str) => {
 const pageProcessor = (htmlString) => {
 
     let ch = cheerio.load(htmlString);
+
     // filter links only belongs medium.com
     ch(`a[href^="${root}"]`).each((i, a) => {
+
         // Ignore query params. Those point to same URL
         let params = []
         params = getParamsFromURL(a.attribs.href.split('?')[1])
@@ -49,11 +52,13 @@ const pageProcessor = (htmlString) => {
             else if(params){
                 links[link]['params'] = params;
             }            
-                    
+
             q.push(link);
-            fs.appendFile('url.csv', link + "\n", function (err, result) {
-                if (err) console.log('error', err);
-            });
+            try{
+                create(link, links[link]['count'], links[link]['params'])
+            }catch(e){
+                update(link, links[link]['count'], links[link]['params'])
+            }
         }else {
             // increase count value for repeated url;
             if(!links[link]['params']){
@@ -64,10 +69,9 @@ const pageProcessor = (htmlString) => {
                 let joinArray = links[link]['params'].concat(params);
                 links[link]['params'] = [... new Set( joinArray)];  
             }
+            update(link, links[link]['count'], links[link]['params'])
         }        
-    });
-    console.log(Object.values(links));
-    
+    });    
 }
 
 const fetchAndParser = (url, callback) => {
@@ -88,8 +92,5 @@ const fetchAndParser = (url, callback) => {
 export const requestHandler = (url) => {
     root = url
     q = async.queue(fetchAndParser, 5)
-    // links[url] = {};
-    // links[url]['status'] = 'false'; 
-    // links[url]['count'] = 1; 
     fs.unlink('url.csv', () => q.push(stripTrailingSlash(root)));
 }
