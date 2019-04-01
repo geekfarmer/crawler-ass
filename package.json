@@ -5,7 +5,8 @@
   "main": "crawler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node -r esm index.js"
+    "start": "node -r esm index.js",
+    "dev": "NODE_ENV=production node --prof -r esm index.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
     "json2csv": "^4.4.1",
     "mongodb": "^3.2.2",
     "mongoose": "^5.4.20",
+    "node-gyp": "^3.8.0",
     "pm2-docker": "^2.1.0",
     "request": "^2.88.0",
     "validator": "^10.11.0"

@@ -1,15 +1,20 @@
 import request from 'request'
 import fs from 'fs'
 import cheerio from 'cheerio'
-import async from 'async'
 import create from './createData'
 import update from './updateData'
+import Queue from './queue'
 
 var rootURL = ''
 var que = null
 var links = {}
 var link = ''
 
+/**
+ * return a url without parameters 
+ * @param {*} str
+ * @returns
+ */
 const stripSlash = (str) => {    
     if (str.substr(-1) === '/') {       
         return str.substr(0, str.length - 1);
@@ -17,6 +22,11 @@ const stripSlash = (str) => {
     return str;
 }
 
+/**
+ * return all parameters key from url
+ * @param {*} str
+ * @returns
+ */
 const getParamsFromURL = (str) => {
     if(str){
         var queryDict = {}
@@ -27,19 +37,24 @@ const getParamsFromURL = (str) => {
     }
 }
 
+/**
+ * Perform scrapping on html body
+ * return complete unique list of parameters associated with https;//medium.com
+ * @param {*} body
+ */
 const htmlScrapper = (body) => {
 
     let ch = cheerio.load(body);
 
     // filter links only belongs medium.com
     ch(`a[href^="${rootURL}"]`).each((i, a) => {
-
-        // Ignore query params. Those point to same URL
         let params = []
+        // get all parameter associated with a url
         params = getParamsFromURL(a.attribs.href.split('?')[1])
+        //get url associated with https;//medium.com
         link = stripSlash(a.attribs.href.split('?')[0])
         
-        // Ignore URLs which are already there
+        // check url is unique or not. If unique perform further action.
         if (!links[link]) {
             links[link] = {};
             links[link]['status'] = 'false'; 
@@ -55,42 +70,62 @@ const htmlScrapper = (body) => {
 
             que.push(link);
             try{
+                // create objects in db
                 create(link, links[link]['count'], links[link]['params'])
             }catch(e){
+                //update objects value
                 update(link, links[link]['count'], links[link]['params'])
             }
         }else {
-            // increase count value for repeated url;
+            //check parameters associated with a url is undefiend or not
             if(!links[link]['params']){
                 links[link]['params'] = ['']
             }
-            links[link]['count'] += 1;             
+            //increase total reference count for repeated urls
+            links[link]['count'] += 1;        
+            
+            //check new params array is empty or not
             if(params && params.length > 0){
                 let joinArray = links[link]['params'].concat(params);
                 links[link]['params'] = [... new Set( joinArray)];  
             }
+            // update object valeus
             update(link, links[link]['count'], links[link]['params'])
         }        
     }); 
 }
 
+/**
+ * request handler
+ * @param {*} url
+ * @param {*} callback
+ */
 const fetchAndParser = (url, callback) => {
-    request(url, (error, response, body) => {
-        if (error) {
-            console.log("Network Error", error);
-            callback(error, url);
-        } else {
-            htmlScrapper(body);
-            links[url] = {};
-            links[url]['status'] = 'true';
-            links[url]['count'] = 1; 
-            callback(error, url);
-        }
-    });
+    return new Promise((resolve, reject) => {
+        console.log(typeof(callback))
+        request(url, (error, response, body) => {
+            if (error) {
+                console.log("Network Error", error);
+                reject(error);
+            } else {
+                htmlScrapper(body);
+                links[url] = {};
+                links[url]['status'] = 'true';
+                links[url]['count'] = 1; 
+                resolve(url);
+            }
+        });
+    })
 }
 
-export const requestHandler = (url) => {
+/**
+ * 
+ * maintain concurrency requests
+ * @param {*} url
+ */
+export const requestHandler = (url, reqCount) => {
     rootURL = url
-    que = async.queue(fetchAndParser, 5)
+    //create queue
+    que = new Queue(fetchAndParser, reqCount)
     fs.unlink('url.csv', () => que.push(stripSlash(rootURL)));
 }

@@ -1,5 +1,14 @@
 import formModel from '../models/linkSchema';
 import update from './updateData'
+
+/**
+ *
+ *
+ * @param {*} url
+ * @param {*} count
+ * @param {*} params
+ */
+// create db values on getting new(unique) url
 const create = (url, count, params) => {
 
     let createData = new formModel({
@@ -15,6 +24,7 @@ const create = (url, count, params) => {
             return doc;
         })
         .catch(err => {
+            // if already in db update value {count} {params}
             console.log('Value Updated');
             update(url, count, params)
         })
