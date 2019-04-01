@@ -6,7 +6,11 @@ v11.10.1
 
 ECMA script version - es6
 ```
-### how to start
+### How to start
+
+* Clone the project using git clone https://github.com/geekfarmer/crawler-ass.git
+
+* Navigate to the folder and follow the instructions.
 
 ```javascript
 // database connection
@@ -19,6 +23,8 @@ ECMA script version - es6
 >> npm start
 ```
 ### Concurrency Queue Test
+
+* To check the concurrency queue test, run the follow code.
 
 ```javascript
 import Queue from './src/services/queue'
@@ -41,11 +47,6 @@ Promise.all(
 
 ```
 ### Docker
-
-* kill container
-```
-sudo docker system prune
-```
 
 * start docker-compose
 ```
