@@ -8,7 +8,7 @@ ECMA script version - es6
 ```
 ### How to start
 
-* Clone the project using git clone https://github.com/geekfarmer/crawler-ass.git
+* Clone the project using git clone https://github.com/geekfarmer/crawler-medium
 
 * Navigate to the folder and follow the instructions.
 
