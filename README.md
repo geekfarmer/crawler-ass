@@ -36,6 +36,14 @@ server: 127.0.0.1:27017
 dbName: Medium
 ```
 
+### Current
+
+![Current Requests Processing](/assets/current.png)
+
+### Before
+
+![Current Requests Processing](/assets/before.png)
+
 ### Parsed data from medium.com
 
 - [x] link - url
