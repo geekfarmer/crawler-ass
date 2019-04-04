@@ -11,7 +11,7 @@ var que = null;
 var links = {};
 var link = "";
 var totalRequests = 0;
-var totalLinks = 0;
+// var totalLinks = 0;
 
 /**
  * return a url without parameters
@@ -70,7 +70,7 @@ const htmlScrapper = body => {
 
             // check url is unique or not. If unique perform further action.
             if (!links[link]) {
-                totalLinks++;
+                que.totalLinks++;
                 links[link] = {};
                 links[link]["status"] = "false";
                 links[link]["count"] = 1;
@@ -114,31 +114,32 @@ const htmlScrapper = body => {
 /**
  * request handler
  * @param {*} url
- * @param {*} callback
  */
 
-const fetchAndParser = async (url, callback) => {
-    while (totalRequests < config.MAX_REQ) {
+ let testHit = 0;
+
+const fetchAndParser = async (url) => {
+    if (totalRequests < config.MAX_REQ) {
         return await rp(url, (error, response, body) => {
-            console.log("Con requests", que.ConRequests()," Request Count", totalRequests);
+            console.log("Request Count", totalRequests);
             if (error) console.log("Network Error", error);
             totalRequests++;
             console.log("crawling......", url);
-            que.dequeue(url);
+            que.dequeue();
             htmlScrapper(body).then((link) => {
                     return link;
                 })
                 .catch((err) => {
                     return err;
                 })
+            que.dequeue(link)
             links[url] = {};
             links[url]["status"] = "true";
             links[url]["count"] = 1;
         });
     }
-    if (que.isStop() ) {
-        console.log("Total crawled Links", totalLinks);
-        que.ProgressStop()
+    else {
+        que.StopCrawler()
         return null;
     }
 };
@@ -154,5 +155,4 @@ export const requestHandler = url => {
     //create queue
     que = new Queue(fetchAndParser, config.CON_REQ);
     que.push(stripSlash(rootURL));
-
 };
