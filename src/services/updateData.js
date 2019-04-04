@@ -22,7 +22,8 @@ const update = (url, count, params) => {
             runValidators: true
         })
         .then(doc => {
-            console.log(doc);
+            // console.log(doc);
+            return 
         })
         .catch(err => {
             console.log(err);

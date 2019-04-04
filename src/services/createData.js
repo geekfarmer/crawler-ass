@@ -20,12 +20,12 @@ const create = (url, count, params) => {
 
     createData.save()
         .then(doc => {
-            console.log(doc);
+            // console.log(doc);
             return doc;
         })
         .catch(err => {
             // if already in db update value {count} {params}
-            console.log('Value Updated');
+            // console.log('Value Updated');
             update(url, count, params)
         })
 }
